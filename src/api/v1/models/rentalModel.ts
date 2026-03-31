@@ -4,17 +4,17 @@ export interface Rental {
     toolId: string,
     customerId: string,
     quantity: number,
-    startDate: Date,
-    endDate: Date,
+    startDate: string,
+    endDate: string,
     totalAmount: number,
     status: "Active" | "Complete" | "Cancelled",
-    createdAt: Date
+    createdAt: string
 }
 
 export interface CreateRental {
     toolId: string,
     customerId: string,
     quantity: number,
-    startDate: Date,
-    endDate: Date
+    startDate: string,
+    endDate: string
 }
