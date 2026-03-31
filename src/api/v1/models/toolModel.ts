@@ -2,7 +2,8 @@
 export interface Tool {
     id: string,
     name: string,
-    description: "Power_tools" | "Hand_tools" | "Gardening" | "Painting" | "Other",
+    description: string,
+    category: "Power_tools" | "Hand_tools" | "Gardening" | "Painting" | "Other",
     dailyRate: number,
     depositAmount: number,
     quantity: number,
@@ -18,5 +19,5 @@ export interface CreateToolDTO {
     dailyRate: number,
     depositAmount: number,
     quantity: number,
-    status: "Available" | "Rented" | "Maintenance",
+    status?: "Available" | "Rented" | "Maintenance",
 }
