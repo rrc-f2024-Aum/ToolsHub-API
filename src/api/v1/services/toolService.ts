@@ -37,7 +37,7 @@ export const createTool = async (
         name: data.name,
         description: data.description,
         category: data.category,
-        dailyRate: data.dailyRate,
+        hourlyRate: data.hourlyRate,
         depositAmount: data.depositAmount,
         quantity: data.quantity,
         status: data.status || "Available",
