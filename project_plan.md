@@ -45,7 +45,7 @@ The API includes four main resources plus the Users resource required for authen
 
 **Users** - Authentication and role management with fields for email, name, role (customer, staff, or admin), phone, and address.
 
-**Tools** - Shop inventory with fields for name, description, category, dailyRate, depositAmount, quantity, and status.
+**Tools** - Shop inventory with fields for name, description, category, hourlyRate, depositAmount, quantity, and status.
 
 **Rentals** - Rental contracts with fields for toolId, customerId, startDate, endDate, totalAmount, lateFee, and status.
 
@@ -115,7 +115,7 @@ Staff can extend a contract only if the tool is not already booked for future da
 
 **Late Fees**
 
-Late fees are applied by staff when processing a return. Calculation is days overdue multiplied by the daily rate.
+Late fees are applied by staff when processing a return. Calculation is hours overdue multiplied by the hourly rate. Customers receive email notifications 30 minutes before rental ends and when rental becomes overdue.
 
 **Tool Availability Status**
 
@@ -131,44 +131,44 @@ Customers can only leave reviews after they have rented and returned a tool. Rev
 
 These endpoints handle tool browsing and inventory management.
 
-GET /tools - List all tools
-GET /tools/:id - Get tool details
-GET /tools/categories - List all categories
+- GET /tools - List all tools
+- GET /tools/:id - Get tool details
+- GET /tools/categories - List all categories
 
 The following endpoints are for Admin only:
-POST /tools - Add new tool
-PUT /tools/:id - Update tool
-DELETE /tools/:id - Delete tool
+- POST /tools - Add new tool
+- PUT /tools/:id - Update tool
+- DELETE /tools/:id - Delete tool
 
 **Rentals Endpoints**
 
 These endpoints handle rental contract management for Staff and Admin.
 
-GET /rentals - View all rentals
-GET /rentals/:id - View any rental by id
-POST /rentals - Create contract for customer
-PUT /rentals/:id - Edit or extend contract
-POST /rentals/:id/return - Process tool return
-DELETE /rentals/:id - Cancel contract
-GET /rentals/active - View active rentals
-GET /rentals/overdue - View overdue rentals
+- GET /rentals - View all rentals
+- GET /rentals/:id - View any rental by id
+- POST /rentals - Create contract for customer
+- PUT /rentals/:id - Edit or extend contract
+- POST /rentals/:id/return - Process tool return
+- DELETE /rentals/:id - Cancel contract
+- GET /rentals/active - View active rentals
+- GET /rentals/overdue - View overdue rentals
 
 **Reviews Endpoints**
 
 These endpoints handle customer reviews.
 
-GET /tools/:id/reviews - Anyone can view reviews
-POST /rentals/:id/review - Customer leaves review after rental completion
-PUT /reviews/:id - Update own review
-DELETE /reviews/:id - Admin only, delete any review
+- GET /tools/:id/reviews - Anyone can view reviews
+- POST /rentals/:id/review - Customer leaves review after rental completion
+- PUT /reviews/:id - Update own review
+- DELETE /reviews/:id - Admin only, delete any review
 
 **Admin Analytics Endpoints**
 
 These endpoints are for Admin only.
 
-GET /admin/reports- list earnings report
-GET /admin/stats/popular-tools - Most rented tools
-GET /admin/users - List all registered users
+- GET /admin/reports- list earnings report
+- GET /admin/stats/popular-tools - Most rented tools
+- GET /admin/users - List all registered users
 
 ### Data Validation with Joi
 
@@ -177,7 +177,7 @@ GET /admin/users - List all registered users
 - name: required, 3 to 100 characters
 - description: required, maximum 500 characters
 - category: required, must be one of power_tools, hand_tools, gardening, painting, or other
-- dailyRate: required, minimum 0.01
+- hourlyRate: required, minimum 0.01
 - depositAmount: required, minimum $1
 - quantity: required, must be an integer
 
@@ -243,11 +243,11 @@ The API will use a global error handler middleware that catches all errors and r
 
 **Node-cron**
 
-This component automates overdue rental detection and late fee assessment without manual intervention. A daily cron job running at 2 AM will scan for rentals with endDate before today and status equal to active, mark them as overdue, and prepare fee calculation.
+This component automates overdue rental detection and late fee assessment without manual intervention. A cron job running every 15 minutes will scan for overdue rentals, calculate late fees based on hourly rates, and trigger email notifications
 
 **Nodemailer**
 
-This component provides professional user experience with email confirmations and reminders. The system will send rental confirmation emails, 24-hour return reminders, and overdue notifications with fee amounts.
+This component provides professional user experience with email confirmations and reminders. The system will send rental confirmation emails, 30-minute return reminder, and overdue notifications with late fee amounts.
 
 ---
 
@@ -287,9 +287,6 @@ The project follows Git Workflow with these branches:
 **Milestone 1 (April 5th, 2026)**
 
 - Initialize Node.js with TypeScript and Express project
-- Configure Firebase Admin SDK
-- Implement authentication middleware
-- Create repository layer for Firestore
 - Build Tools CRUD with Joi validation for admin only
 - Build basic Rentals CRUD
 - Configure Swagger documentation
@@ -297,16 +294,19 @@ The project follows Git Workflow with these branches:
 
 **Milestone 2 (April 11th, 2026)**
 
+- Configure Firebase Admin SDK
+- Implement authentication middleware
+- Create repository layer for Firestore
 - Implement availability checking logic
 - Add role-based middleware for customer, staff, and admin
 - Complete Rentals resource with create, edit, extend, return, and cancel
 - Build Reviews resource
-- Integrate nodemailer for basic emails
 - Set up node-cron job skeleton
 - Prepare sprint demo
 
 **Milestone 3 (April 19th, 2026)**
 
+- Integrate nodemailer for basic emails
 - Complete cron job with overdue detection and fee calculation
 - Add email queue system
 - Build Admin reports for weekly, monthly, and annual earnings
