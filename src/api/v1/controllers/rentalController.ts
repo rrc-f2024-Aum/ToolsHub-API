@@ -97,7 +97,7 @@ export const displayAllRentals = async(
 }
 
 // display rental by id
-export const displayRentalByIf = async(
+export const displayRentalById = async(
     req: Request, res: Response, next: NextFunction
 ): Promise<void> => {
     

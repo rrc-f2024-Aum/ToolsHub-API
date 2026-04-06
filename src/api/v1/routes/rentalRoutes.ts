@@ -98,7 +98,7 @@ router.get("/customer/:customerId", rentalController.displayRentalsByCustomer);
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 // GET - by rental Id
-router.get("/:id", rentalController.displayRentalByIf);
+router.get("/:id", rentalController.displayRentalById);
 
 /**
  * @openapi
