@@ -24,7 +24,7 @@ I will run the check **every 15 minutes** (`*/15 * * * *`). This catches overdue
 
 ### What it will do
 - Find all active rentals where endDate is past current time.
-- Calculate late fees (days overdue x hourlyRate x quantity).
+- Calculate late fees (hours overdue x hourlyRate x quantity).
 - Update rental status to "overdue".
 - Trigger nodemailer to send overdue notification emails.
 
