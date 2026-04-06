@@ -25,7 +25,7 @@ const router = Router();
  *                 data:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/Rental
+ *                     $ref: '#/components/schemas/Rental'
  */ 
 // GET - all rentals
 router.get("/", rentalController.displayAllRentals);
@@ -95,7 +95,7 @@ router.get("/customer/:customerId", rentalController.displayRentalsByCustomer);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 // GET - by rental Id
 router.get("/:id", rentalController.displayRentalByIf);
