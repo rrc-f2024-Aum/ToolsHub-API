@@ -3,7 +3,7 @@ import { db } from "../../../config/firebaseConfig";
 export const createDocument = async<T>(
     collectionName: string,
     data: Partial<T>,
-    id: string
+    id?: string
 ): Promise<string> => {
     try {
         let docRef: FirebaseFirestore.DocumentReference;
@@ -116,3 +116,20 @@ export const runTransaction = async <T>(
         throw new Error(`Transaction failed: ${errorMessage}`);
     }
 };
+
+export const findByField = async (
+    collectionName: string,
+    field: string,
+    value: any
+): Promise<FirebaseFirestore.QuerySnapshot> => {
+    try {
+        return await db.collection(collectionName).where(field, "==", value).get();
+
+    } catch (error: unknown) {
+        const errorMessage = 
+            error instanceof Error ? error.message: "Unknown error";
+        throw new Error(
+            `Failed to query ${collectionName} by ${field}: ${errorMessage}`
+        );
+    }
+}
