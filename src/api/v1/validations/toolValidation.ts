@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-const categories = ["power_tools", "hand_tools", "gardening", "painting", "other"] as const;
+const categories = ["Power_tools", "Hand_tools", "Gardening", "Painting", "Other"] as const;
 const statuses = ["Available", "Rented", "Maintenance"] as const;
 
 export const toolSchemas = {
@@ -21,7 +21,7 @@ export const toolSchemas = {
             }),
             category: Joi.string().valid(...categories).required().messages({
                 "any.required": "Category is required",
-                "any.only": "Category must be one of: power_tools, hand_tools, gardening, painting, other"
+                "any.only": "Category must be one of: Power_tools, Hand_tools, Gardening, Painting, Other"
             }),
             hourlyRate: Joi.number().min(0.01).required().messages({
                 "any.required": "Hourly rate is required",
@@ -81,7 +81,7 @@ export const toolSchemas = {
                 "string.max": "Description cannot exceed 500 characters"
             }),
             category: Joi.string().valid(...categories).optional().messages({
-                "any.only": "Category must be one of: power_tools, hand_tools, gardening, painting, other"
+                "any.only": "Category must be one of: Power_tools, Hand_tools, Gardening, Painting, Other"
             }),
             hourlyRate: Joi.number().min(0.01).optional().messages({
                 "number.min": "Hourly rate must be at least 0.01"

@@ -15,7 +15,7 @@ const calculateLateFee = (
     const start = new Date(currentDate);
     const end = new Date(endDate);
 
-    const hoursOverdue = end.getTime() - start.getTime()/
+    const hoursOverdue = (start.getTime() - end.getTime())/
     (1000 * 60 * 60);
 
     return hourlyRate * quantity * hoursOverdue;
@@ -40,7 +40,7 @@ const updateOverdueRentals = async(): Promise<void> => {
         for (const doc of snapshot.docs) {
             const rental = doc.data();
 
-            const tool = await toolService.getToolById(rental.tooId);
+            const tool = await toolService.getToolById(rental.toolId);
             
             if (!tool) {
                 console.log(`[${now.toISOString}] Tool ${rental.toolId} not found for rental ${doc.id}`);
@@ -59,10 +59,10 @@ const updateOverdueRentals = async(): Promise<void> => {
 
             updatedCount++;
             
-            console.log(`[${now.toISOString}] Updated rental ${doc.id} - Late fee: $$(lateFee)`);
-
-            console.log(`[${now.toISOString()}] Processed ${updatedCount} overdue rentals`);
+            console.log(`[${now.toISOString}] Updated rental ${doc.id} - Late fee: $${lateFee}`);
         }
+            console.log(`[${now.toISOString()}] Processed ${updatedCount} overdue rentals`);
+        
     
     } catch (error) {
         console.error(`[${now.toISOString()}] Error updating overdue rentals:`, error);
