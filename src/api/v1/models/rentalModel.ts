@@ -7,8 +7,11 @@ export interface Rental {
     startDate: string,
     endDate: string,
     totalAmount: number,
-    status: "Active" | "Complete" | "Cancelled",
-    createdAt: string
+    status: "Active" | "Completed" | "Cancelled" | "Overdue",
+    lateFee: number,
+    reminderSent: boolean,
+    createdAt: string,
+    returnedAt?: string
 }
 
 export interface CreateRental {
