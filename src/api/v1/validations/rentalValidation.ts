@@ -121,6 +121,18 @@ export const rentalSchemas = {
                 "string.empty": "Rental ID cannot be empty"
             })
         })
+    },
+
+    // GET - all rentals
+    list: {
+        query: Joi.object({
+            page: Joi.number().integer().min(1).default(1),
+            limit: Joi.number().integer().min(1).max(100).default(10),
+            status: Joi.string().valid(...statuses).optional(),
+            customerId: Joi.string().optional(),
+            sortBy: Joi.string().valid("startDate", "endDate", "createdAt", "totalAmount").default("startDate"),
+            sortOrder: Joi.string().valid("asc", "desc").default("desc")
+        })
     }
 
 }

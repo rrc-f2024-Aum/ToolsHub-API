@@ -109,4 +109,16 @@ export const toolSchemas = {
             }),
         }),
     },
+
+    // GET - all tools
+    list: {
+        query: Joi.object({
+            page: Joi.number().integer().min(1).default(1),
+            limit: Joi.number().integer().min(1).max(100).default(10),
+            status: Joi.string().valid(...statuses).optional(),
+            category: Joi.string().valid(...categories).optional(),
+            sortBy: Joi.string().valid("name", "hourlyRate", "createdAt").default("name"),
+            sortOrder: Joi.string().valid("asc", "desc").default("asc"),
+        })
+    }
 };
