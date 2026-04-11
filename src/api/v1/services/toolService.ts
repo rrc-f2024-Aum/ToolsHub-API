@@ -1,86 +1,157 @@
 import { Tool, CreateToolDTO } from "../models/toolModel";
+import * as firestoreRepository from "../repositories/firestoreRepository";
 
-// Health Check
+const COLLECTION_NAME = "tools";
+
+// Health check
 export const getHealthStatus = () => {
     return {
         status: "OK",
         uptime: process.uptime(),
-        timeStamp: new Date().toISOString(),
+        timestamp: new Date().toISOString(),
         version: "1.0.0"
     }
 }
 
-// creating in-memory storage for milestone 1, will update it to firebase in milestone 2
-let tools: Tool[] = [];
-let nextId = 1;
+// Helper function to format Firestore data
+const formatToolData = (doc: FirebaseFirestore.DocumentSnapshot): Tool => {
+    const data = doc.data()!;
 
-// GET - all tools
-export const getAllTools = async(): Promise<Tool[]> => {
-    return tools;
-}
+    const formatDate = (dateValue: any): string => {
+        if (dateValue && typeof dateValue === 'object' && '_seconds' in dateValue) {
+            return new Date(dateValue._seconds * 1000).toISOString();
+        }
+        return dateValue ? new Date(dateValue).toISOString() : new Date().toISOString();
+    }
 
-// GET - a tool by id
-export const getToolById = async(
-    id: string
-): Promise<Tool | null> => {
-    const tool = tools.find(t => t.id === id);
-    return tool || null;
-}
-
-// POST - create a new tool
-export const createTool = async (
-    data: CreateToolDTO
-): Promise<Tool> => {
-
-    const newTool: Tool = {
-        id: String(nextId++),
+    return {
+        id: doc.id,
         name: data.name,
         description: data.description,
         category: data.category,
         hourlyRate: data.hourlyRate,
         depositAmount: data.depositAmount,
         quantity: data.quantity,
-        status: data.status || "Available",
-        createdAt: new Date().toISOString()
-    };
-    tools.push(newTool);
-    return newTool;
+        status: data.status ?? 'Available',
+        createdAt: formatDate(data.createdAt)
+    } as Tool;
 }
 
-// PUT - update a tool details by id
+// Create tool
+export const createTool = async (toolData: CreateToolDTO): Promise<string> => {
+    try {
+        const snapshot = await firestoreRepository.getDocuments(COLLECTION_NAME);
+
+        let nextId = "tool_000001";
+        if (!snapshot.empty) {
+            const ids: number[] = [];
+            snapshot.forEach(doc => {
+                const match = doc.id.match(/tool_(\d+)/);
+                if (match) {
+                    ids.push(parseInt(match[1], 10));
+                }
+            });
+
+            if (ids.length > 0) {
+                const maxId = Math.max(...ids);
+                const nextNumber = maxId + 1;
+                nextId = `tool_${nextNumber.toString().padStart(6, "0")}`;
+            }
+        }
+
+        const now = new Date().toISOString();
+        const toolDataWithTime = {
+            ...toolData,
+            status: toolData.status ?? 'Available',
+            createdAt: now
+        };
+
+        const toolId = await firestoreRepository.createDocument<Tool>(
+            COLLECTION_NAME,
+            toolDataWithTime,
+            nextId
+        );
+
+        return toolId;
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to create tool: ${errorMessage}`);
+    }
+}
+
+// Get all tools
+export const getAllTools = async (): Promise<Tool[]> => {
+    try {
+        const snapshot = await firestoreRepository.getDocuments(COLLECTION_NAME);
+
+        const tools: Tool[] = [];
+        snapshot.forEach((doc) => {
+            tools.push(formatToolData(doc));
+        });
+
+        return tools;
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to fetch tools: ${errorMessage}`);
+    }
+}
+
+// Get tool by ID
+export const getToolById = async (id: string): Promise<Tool | null> => {
+    try {
+        const doc = await firestoreRepository.getDocumentById(COLLECTION_NAME, id);
+
+        if (!doc) {
+            return null;
+        }
+
+        return formatToolData(doc);
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to fetch tool ${id}: ${errorMessage}`);
+    }
+}
+
+// Update tool by ID
 export const updateTool = async (
     id: string,
-    data: Partial<CreateToolDTO>
-): Promise<Tool | null> => {
-
-    const index = tools.findIndex(t => t.id === id);
-    if (index === -1) 
-        return null;
-
-    tools[index] = {
-        ...tools[index],
-        ...data
-    };
-    return tools[index];
+    toolData: Partial<CreateToolDTO>
+): Promise<void> => {
+    try {
+        await firestoreRepository.updateDocument<CreateToolDTO>(
+            COLLECTION_NAME,
+            id,
+            toolData
+        );
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to update tool ${id}: ${errorMessage}`);
+    }
 }
 
-// DELETE - Delete a tool by id
-export const deleteTool = async(
-    id: string
-): Promise<boolean> => {
-    
-    const index = tools.findIndex(t => t.id === id);
-    if (index === -1)
-        return false;
-
-    tools.splice(index, 1);
-    return true;
+// Delete tool by ID
+export const deleteTool = async (id: string): Promise<void> => {
+    try {
+        await firestoreRepository.deleteDocument(COLLECTION_NAME, id);
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to delete tool ${id}: ${errorMessage}`);
+    }
 }
 
-// GET - tools by category
-export const getToolsByCategory = async(
-    category: Tool["category"]
-): Promise<Tool[]> => {
+// Get tools by category
+export const getToolsByCategory = async (category: Tool["category"]): Promise<Tool[]> => {
+    try {
+        const snapshot = await firestoreRepository.findByField(COLLECTION_NAME, "category", category);
 
-    return tools.filter(tool => tool.category === category)
+        const tools: Tool[] = [];
+        snapshot.forEach((doc) => {
+            tools.push(formatToolData(doc));
+        });
+
+        return tools;
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        throw new Error(`Failed to fetch tools by category ${category}: ${errorMessage}`);
+    }
 }
