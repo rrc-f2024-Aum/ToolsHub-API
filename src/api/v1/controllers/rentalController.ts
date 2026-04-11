@@ -40,7 +40,7 @@ const validateRentalExists = async(id: string, res: Response
         return null;
     }
 
-    return null;
+    return rental;
 }
 
 // helper function
@@ -200,7 +200,7 @@ export const displayRentalsByCustomer = async(
             return;
         }
 
-        const rentals = await rentalService.getRentalByCustomer(customerId);
+        const rentals = await rentalService.getRentalsByCustomer(customerId);
 
         res.status(HTTP_STATUS.OK).json(
             successResponse(rentals, 
