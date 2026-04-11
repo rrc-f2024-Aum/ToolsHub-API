@@ -1,5 +1,7 @@
 import { Router } from "express";
 import * as rentalController from "../controllers/rentalController";
+import { validateRequest } from "../middleware/validate";
+import { rentalSchemas } from "../validations/rentalValidation";
 
 const router = Router();
 
@@ -28,7 +30,15 @@ const router = Router();
  *                     $ref: '#/components/schemas/Rental'
  */ 
 // GET - all rentals
-router.get("/", rentalController.displayAllRentals);
+router.get("/", 
+    validateRequest(rentalSchemas.list),
+    rentalController.displayAllRentals);
+
+// GET - rentals by active status
+router.get("/active", rentalController.displayAllRentals);
+
+// GET - overdue rentals 
+router.get("/overdue", rentalController.displayAllRentals);
 
 /**
  * @openapi
@@ -62,7 +72,9 @@ router.get("/", rentalController.displayAllRentals);
  *                     $ref: '#/components/schemas/Rental'
  */
 // GET - by customer Id
-router.get("/customer/:customerId", rentalController.displayRentalsByCustomer);
+router.get("/customer/:customerId", 
+    validateRequest(rentalSchemas.getByCustomer),
+    rentalController.displayRentalsByCustomer);
 
 /**
  * @openapi
@@ -98,7 +110,9 @@ router.get("/customer/:customerId", rentalController.displayRentalsByCustomer);
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 // GET - by rental Id
-router.get("/:id", rentalController.displayRentalById);
+router.get("/:id", 
+    validateRequest(rentalSchemas.getById),
+    rentalController.displayRentalById);
 
 /**
  * @openapi
@@ -133,7 +147,20 @@ router.get("/:id", rentalController.displayRentalById);
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 // POST - create new rental
-router.post("/", rentalController.generateRental);
+router.post("/", 
+    validateRequest(rentalSchemas.create),
+    rentalController.generateRental);
+
+// POST - return rental
+router.post(
+    "/:id/return",
+    validateRequest(rentalSchemas.getById),
+    rentalController.returnRental);
+
+// POST - update rental [time extension]
+router.put("/:id",
+    validateRequest(rentalSchemas.update),
+    rentalController.updateRentalDetails);
 
 /**
  * @openapi
