@@ -298,17 +298,17 @@ The project follows Git Workflow with these branches:
 - Implement authentication middleware
 - Create repository layer for Firestore
 - Implement availability checking logic
-- Add role-based middleware for customer, staff, and admin
 - Complete Rentals resource with create, edit, extend, return, and cancel
-- Build Reviews resource
 - Set up node-cron job skeleton
+- Complete cron job with overdue detection and fee calculation
 - Prepare sprint demo
 
 **Milestone 3 (April 19th, 2026)**
 
 - Integrate nodemailer for basic emails
-- Complete cron job with overdue detection and fee calculation
+- Add role-based middleware for customer, staff, and admin
 - Add email queue system
+- Build Reviews resource
 - Build Admin reports for weekly, monthly, and annual earnings
 - Add advanced filtering for categories and price ranges
 - Complete all Swagger documentation
