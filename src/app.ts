@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from 'express';
 import morgan from "morgan";
 import toolRoutes from "../src/api/v1/routes/toolRoutes";
