@@ -46,7 +46,7 @@ const calculateTotalAmount = (
 };
 
 // Create rental
-export const createRental = async (rentalData: CreateRentalDTO): Promise<string> => {
+export const createRental = async (rentalData: CreateRental): Promise<string> => {
     try {
         // Check if tool exists and is available
         const tool = await toolService.getToolById(rentalData.toolId);
@@ -67,8 +67,12 @@ export const createRental = async (rentalData: CreateRentalDTO): Promise<string>
         );
         
         const now = new Date().toISOString();
-        const rentalDataWithTime = {
-            ...rentalData,
+        const rentalDataWithTime: Omit<Rental, 'id'> = {
+            toolId: rentalData.toolId,
+            customerId: rentalData.customerId,
+            quantity: rentalData.quantity,
+            startDate: rentalData.startDate,
+            endDate: rentalData.endDate,
             totalAmount,
             status: 'Active',
             lateFee: 0,
@@ -188,20 +192,34 @@ export const updateRental = async (
             throw new NotFoundError(`Rental with ID ${id} not found`);
         }
         
+        const updateData: Partial<Rental> = {};
+
+        if (rentalData.status){
+            updateData.status = rentalData.status as "Active" | "Completed" | "Cancelled" | "Overdue";
+        } 
+
         // If extending, recalculate total amount
         if (rentalData.endDate && rentalData.endDate !== rental.endDate) {
+            updateData.endDate = rentalData.endDate;
+
             const tool = await toolService.getToolById(rental.toolId);
             if (tool) {
                 const additionalHours = (new Date(rentalData.endDate).getTime() - new Date(rental.endDate).getTime()) / (1000 * 60 * 60);
+
                 const additionalAmount = tool.hourlyRate * rental.quantity * additionalHours;
-                rentalData = { ...rentalData, totalAmount: rental.totalAmount + additionalAmount };
+                
+                updateData.totalAmount = rental.totalAmount + additionalAmount;
             }
         }
         
+        if (Object.keys(updateData).length === 0) {
+            return;
+        }
+
         await firestoreRepository.updateDocument<Rental>(
             COLLECTION_NAME,
             id,
-            rentalData
+            updateData
         );
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
