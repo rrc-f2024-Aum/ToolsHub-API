@@ -1,3 +1,4 @@
+import { NotFoundError } from "../errors/errors";
 import { Tool, CreateToolDTO } from "../models/toolModel";
 import * as firestoreRepository from "../repositories/firestoreRepository";
 
@@ -38,7 +39,7 @@ const formatToolData = (doc: FirebaseFirestore.DocumentSnapshot): Tool => {
 }
 
 // Create tool
-export const createTool = async (toolData: CreateToolDTO): Promise<string> => {
+export const createTool = async (toolData: CreateToolDTO): Promise<Tool> => {
     try {
         const snapshot = await firestoreRepository.getDocuments(COLLECTION_NAME);
 
@@ -72,7 +73,11 @@ export const createTool = async (toolData: CreateToolDTO): Promise<string> => {
             nextId
         );
 
-        return toolId;
+        return {
+            id: toolId,
+            ...toolDataWithTime
+        } as Tool;
+
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         throw new Error(`Failed to create tool: ${errorMessage}`);
@@ -116,13 +121,22 @@ export const getToolById = async (id: string): Promise<Tool | null> => {
 export const updateTool = async (
     id: string,
     toolData: Partial<CreateToolDTO>
-): Promise<void> => {
+): Promise<Tool> => {
     try {
+        const existingTool = await getToolById(id);
+        if (!existingTool) {
+            throw new NotFoundError(`Tool with ID ${id} not found`);
+        }
+
         await firestoreRepository.updateDocument<CreateToolDTO>(
             COLLECTION_NAME,
             id,
             toolData
         );
+
+        const updatedTool = await getToolById(id);
+        return updatedTool as Tool;
+
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         throw new Error(`Failed to update tool ${id}: ${errorMessage}`);
@@ -130,9 +144,16 @@ export const updateTool = async (
 }
 
 // Delete tool by ID
-export const deleteTool = async (id: string): Promise<void> => {
+export const deleteTool = async (id: string): Promise<boolean> => {
     try {
+        const existingTool = await getToolById(id);
+        if (!existingTool) {
+            return false;
+        }
+        
         await firestoreRepository.deleteDocument(COLLECTION_NAME, id);
+        return true;
+
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         throw new Error(`Failed to delete tool ${id}: ${errorMessage}`);
