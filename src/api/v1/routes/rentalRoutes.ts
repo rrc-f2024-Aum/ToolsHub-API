@@ -196,6 +196,8 @@ router.put("/:id",
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 // POST - cancel rental by Id
-router.post("/:id/cancel", rentalController.cancelRental);
+router.post("/:id/cancel", 
+    validateRequest(rentalSchemas.cancel),
+    rentalController.cancelRental);
 
 export default router;
