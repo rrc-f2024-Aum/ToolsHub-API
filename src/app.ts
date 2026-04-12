@@ -13,7 +13,7 @@ app.use(express.json());
 
 setupSwagger(app);
 
-app.use("/api/v1", toolRoutes);
-app.use("/api/v1", rentalRoutes);
+app.use("/api/v1/tools", toolRoutes);
+app.use("/api/v1/rentals", rentalRoutes);
 
 export default app;
