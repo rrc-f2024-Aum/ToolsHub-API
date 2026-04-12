@@ -181,7 +181,7 @@ export const getOverdueRentals = async (): Promise<Rental[]> => {
     }
 }
 
-// Update rental (edit or extend)
+// Update rental
 export const updateRental = async (
     id: string,
     rentalData: { endDate?: string; status?: string }
@@ -320,5 +320,29 @@ export const checkAvailability = async (
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         throw new Error(`Failed to check availability: ${errorMessage}`);
+    }
+}
+
+// get rentals by tool id
+export const getRentalsByTool = async (
+    toolId: string
+): Promise<Rental[]> => {
+    try {
+        const snapshot = await firestoreRepository.findByField(COLLECTION_NAME,
+            "toolId",
+            toolId
+        );
+
+        const rentals: Rental[] = [];
+        snapshot.forEach((doc) => {
+            rentals.push(formatRentalData(doc));
+        });
+
+        return rentals;
+    
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+
+        throw new Error(`Failed to fetch rentals for tool ${toolId}: ${errorMessage}`);
     }
 }
