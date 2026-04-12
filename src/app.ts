@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from 'express';
 import morgan from "morgan";
 import toolRoutes from "../src/api/v1/routes/toolRoutes";
@@ -11,7 +13,7 @@ app.use(express.json());
 
 setupSwagger(app);
 
-app.use("/api/v1", toolRoutes);
-app.use("/api/v1", rentalRoutes);
+app.use("/api/v1/tools", toolRoutes);
+app.use("/api/v1/rentals", rentalRoutes);
 
 export default app;

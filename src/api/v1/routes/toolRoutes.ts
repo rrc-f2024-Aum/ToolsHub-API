@@ -1,5 +1,7 @@
 import { Router } from "express";
 import * as toolController from "../controllers/toolController";
+import { validateRequest } from "../middleware/validate";
+import { toolSchemas } from "../validations/toolValidation";
 
 const router = Router();
 
@@ -59,7 +61,9 @@ router.get("/health", toolController.checkHealth);
  *                     $ref: '#/components/schemas/Tool'
  */
 // GET - All Tools
-router.get("/", toolController.displayAllTools);
+router.get("/", 
+    validateRequest(toolSchemas.list),
+    toolController.displayAllTools);
 
 /**
  * @openapi
@@ -95,6 +99,7 @@ router.get("/", toolController.displayAllTools);
  */
 // GET - tools by category
 router.get("/category/:category",
+    validateRequest(toolSchemas.getByCategory),
     toolController.displayToolByCategory
 );
 
@@ -132,7 +137,9 @@ router.get("/category/:category",
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 // GET - tool by id
-router.get("/:id", toolController.displayToolById);
+router.get("/:id", 
+    validateRequest(toolSchemas.getById),
+    toolController.displayToolById);
 
 /**
  * @openapi
@@ -167,7 +174,9 @@ router.get("/:id", toolController.displayToolById);
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 // POST - create new tool
-router.post("/", toolController.generateTool);
+router.post("/",
+    validateRequest(toolSchemas.create),
+    toolController.generateTool);
 
 /**
  * @openapi
@@ -213,7 +222,9 @@ router.post("/", toolController.generateTool);
  *         description: Tool not found
  */
 // PUT - update tool by id 
-router.put("/:id", toolController.updateToolDetails);
+router.put("/:id",
+    validateRequest(toolSchemas.update),
+    toolController.updateToolDetails);
 
 /**
  * @openapi
@@ -236,6 +247,8 @@ router.put("/:id", toolController.updateToolDetails);
  *         description: Tool not found
  */
 // DELETE - tool by id
-router.delete("/:id", toolController.removeTool);
+router.delete("/:id", 
+    validateRequest(toolSchemas.delete),
+    toolController.removeTool);
 
 export default router;
