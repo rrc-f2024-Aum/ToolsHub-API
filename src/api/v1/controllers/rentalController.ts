@@ -127,9 +127,9 @@ export const generateRental = async (
         if(!validateRentalData(rentalData, res))
             return;
 
-        const newRental = await rentalService.createRental(rentalData);
+        const rentalId = await rentalService.createRental(rentalData);
 
-        if(!newRental) {
+        if(!rentalId) {
             res.status(HTTP_STATUS.BAD_REQUEST).json(
                 errorResponse("Tool not available or not found",
                     "TOOL_NOT_AVAILABLE"
@@ -138,6 +138,8 @@ export const generateRental = async (
 
             return;
         }
+
+        const newRental = await rentalService.getRentalById(rentalId);
 
         res.status(HTTP_STATUS.CREATED).json(
             successResponse(newRental, "Rental created successfully")
@@ -210,5 +212,94 @@ export const displayRentalsByCustomer = async(
         );
     } catch (error) {
         next (error);
+    }
+}
+
+// display active rentals
+export const displayActiveRentals = async(
+    req: Request, res: Response, next: NextFunction
+): Promise<void> =>  {
+    try {
+        const rentals = await rentalService.getActiveRentals();
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(rentals, "Active rentals retrieved successfully",
+                rentals.length
+            )
+        );
+
+    } catch (error) {
+        next(error);
+    }
+
+}
+
+// display overdue rentals
+export const displayOverdueRentals = async(
+    req: Request, res: Response, next: NextFunction
+): Promise<void> => {
+    try {
+        const rentals = await rentalService.getOverdueRentals();
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(rentals, "Overdue rentals retrieved successfully",
+                rentals.length
+            )
+        );
+    
+    } catch (error) {
+        next(error);
+    }
+}
+
+// rental return
+export const returnRental = async(
+    req: Request, res: Response, next: NextFunction
+): Promise<void> => {
+    try {
+        const id = validateId(req, res);
+        if (!id) return;
+
+        const rental = await validateRentalExists(id, res);
+        if (!rental) return;
+
+        if (rental.status !== "Active") {
+            res.status(HTTP_STATUS.BAD_REQUEST).json(
+                errorResponse(`Cannot return rental with status: ${rental.status}`,
+                    "INVALID_RENTAL_STATUS"
+                )
+            );
+            return;
+        }
+        
+        await rentalService.returnRental(id);
+        res.status(HTTP_STATUS.OK).json(successResponse(null, "Rental returned successfully"));
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+// update rental details
+export const updateRentalDetails = async(
+    req: Request, res: Response, next: NextFunction
+): Promise<void> => {
+    try {
+        const id = validateId(req, res);
+        if (!id) return;
+
+        const rental = await validateRentalExists(id, res);
+        if (!rental) return;
+
+        const { endDate, status } = req.body;
+        await rentalService.updateRental(id, { endDate, status });
+
+        const updatedRental = await rentalService.getRentalById(id);
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(updatedRental, 
+                "Rental updated successfully"
+            )
+        );
+
+    } catch (error) {
+        next(error);
     }
 }
