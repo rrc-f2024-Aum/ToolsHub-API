@@ -5,40 +5,11 @@ import { rentalSchemas } from "../validations/rentalValidation";
 
 const router = Router();
 
-/**
- * @openapi
- * /rentals:
- *   get:
- *     summary: Get all rentals
- *     description: Retrieve a list of all rental contracts
- *     tags: [Rentals]
- *     responses:
- *       200:
- *         description: Rentals retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 count:
- *                   type: integer
- *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Rental'
- */ 
-// GET - all rentals
-router.get("/", 
-    validateRequest(rentalSchemas.list),
-    rentalController.displayAllRentals);
-
 // GET - rentals by active status
-router.get("/active", rentalController.displayAllRentals);
+router.get("/active", rentalController.displayActiveRentals);
 
 // GET - overdue rentals 
-router.get("/overdue", rentalController.displayAllRentals);
+router.get("/overdue", rentalController.displayOverdueRentals);
 
 /**
  * @openapi
@@ -75,6 +46,40 @@ router.get("/overdue", rentalController.displayAllRentals);
 router.get("/customer/:customerId", 
     validateRequest(rentalSchemas.getByCustomer),
     rentalController.displayRentalsByCustomer);
+
+// GET - by tool Id
+router.get("/tool/:toolId", 
+    validateRequest(rentalSchemas.getByTool),
+    rentalController.displayRentalsByTool);
+
+/**
+ * @openapi
+ * /rentals:
+ *   get:
+ *     summary: Get all rentals
+ *     description: Retrieve a list of all rental contracts
+ *     tags: [Rentals]
+ *     responses:
+ *       200:
+ *         description: Rentals retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 count:
+ *                   type: integer
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Rental'
+ */ 
+// GET - all rentals
+router.get("/", 
+    validateRequest(rentalSchemas.list),
+    rentalController.displayAllRentals);
 
 /**
  * @openapi
