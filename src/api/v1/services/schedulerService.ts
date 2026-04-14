@@ -31,7 +31,7 @@ const updateOverdueRentals = async(): Promise<void> => {
         .where("endDate", "<", now.toISOString()).get();
 
         if (snapshot.empty) {
-            console.log(`[${now.toISOString}] No overdue rentals found`);
+            console.log(`[${now.toISOString()}] No overdue rentals found`);
             return;
         }
 
@@ -43,13 +43,12 @@ const updateOverdueRentals = async(): Promise<void> => {
             const tool = await toolService.getToolById(rental.toolId);
             
             if (!tool) {
-                console.log(`[${now.toISOString}] Tool ${rental.toolId} not found for rental ${doc.id}`);
+                console.log(`[${now.toISOString()}] Tool ${rental.toolId} not found for rental ${doc.id}`);
 
                 continue;
             }
 
-            const endDate = new Date(rental.endDate).toISOString();
-            const lateFee = calculateLateFee(tool.hourlyRate, rental.quantity, endDate, now.toISOString());
+            const lateFee = calculateLateFee(tool.hourlyRate, rental.quantity, rental.endDate, now.toISOString());
 
             await doc.ref.update({
                 status: "Overdue",
@@ -59,7 +58,7 @@ const updateOverdueRentals = async(): Promise<void> => {
 
             updatedCount++;
             
-            console.log(`[${now.toISOString}] Updated rental ${doc.id} - Late fee: $${lateFee}`);
+            console.log(`[${now.toISOString()}] Updated rental ${doc.id} - Late fee: $${lateFee.toFixed(2)}`);
         }
             console.log(`[${now.toISOString()}] Processed ${updatedCount} overdue rentals`);
         
