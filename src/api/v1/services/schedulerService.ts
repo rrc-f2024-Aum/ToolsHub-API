@@ -12,10 +12,10 @@ const calculateLateFee = (
     currentDate: string
 ): number => {
 
-    const start = new Date(currentDate);
+    const now = new Date(currentDate);
     const end = new Date(endDate);
 
-    const hoursOverdue = (start.getTime() - end.getTime())/
+    const hoursOverdue = (now.getTime() - end.getTime())/
     (1000 * 60 * 60);
 
     return hourlyRate * quantity * hoursOverdue;
