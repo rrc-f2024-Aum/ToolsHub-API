@@ -21,9 +21,7 @@ const router = Router();
  *       200:
  *         description: Reviews retrieved successfully
  */
-router.get("/tools/:toolId/reviews",
-    reviewController.displayReviewsByTool
-);
+router.get("/tools/:toolId/reviews", reviewController.displayReviewsByTool);
 
 /**
  * @openapi
@@ -65,10 +63,11 @@ router.get("/tools/:toolId/reviews",
  *       403:
  *         description: Insufficient permissions
  */
-router.post("/rentals/:rentalId/review",
-    authenticate,
-    authorize({ hasRole: ["customer", "staff", "admin"]}),
-    reviewController.generateReview
+router.post(
+  "/rentals/:rentalId/review",
+  authenticate,
+  authorize({ hasRole: ["customer", "staff", "admin"] }),
+  reviewController.generateReview,
 );
 
 /**
@@ -106,10 +105,11 @@ router.post("/rentals/:rentalId/review",
  *       404:
  *         description: Review not found
  */
-router.put("/reviews/:reviewId",
-    authenticate,
-    authorize({ hasRole: ["staff", "admin"], allowSameUser: true}),
-    reviewController.updateReviewDetails
+router.put(
+  "/reviews/:reviewId",
+  authenticate,
+  authorize({ hasRole: ["staff", "admin"], allowSameUser: true }),
+  reviewController.updateReviewDetails,
 );
 
 /**
@@ -134,10 +134,11 @@ router.put("/reviews/:reviewId",
  *       404:
  *         description: Review not found
  */
-router.delete("/reviews/:reviewId",
-    authenticate,
-    authorize({ hasRole: ["admin"]}),
-    reviewController.deleteReview
+router.delete(
+  "/reviews/:reviewId",
+  authenticate,
+  authorize({ hasRole: ["admin"] }),
+  reviewController.deleteReview,
 );
 
 export default router;
