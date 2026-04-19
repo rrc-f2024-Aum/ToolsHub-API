@@ -92,3 +92,23 @@ export const sendOverdueNotification = async (
     
     await sendEmail(customerEmail, "ToolHub - Overdue Rental Notice", html);
 };
+
+// Reminder email - 30mins before end time
+export const sendReminderEmail = async (
+    customerEmail: string,
+    customerName: string,
+    toolName: string,
+    endDate: string
+): Promise<void> => {
+    const html = `
+        <h2 style="color: #f39c12;">Rental Return Reminder</h2>
+        <p>Hi ${customerName},</p>
+        <p>Your rental of <strong>${toolName}</strong> is due in <strong>30 minutes</strong>!</p>
+        <p><strong>Due Time:</strong> ${new Date(endDate).toLocaleString()}</p>
+        <p>Please return the tool on time to avoid late fees.</p>
+        <hr />
+        <p>Thanks for using ToolHub!</p>
+  `;
+
+    await sendEmail(customerEmail, "ToolHub - Rental Due in 30 Minutes", html);
+};
