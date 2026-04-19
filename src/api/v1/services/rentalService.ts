@@ -58,6 +58,16 @@ export const createRental = async (rentalData: CreateRental): Promise<string> =>
             throw new ConflictError(`Tool ${rentalData.toolId} is not available for rental`);
         }
         
+        const isAvailable = await checkAvailability(
+            rentalData.toolId,
+            rentalData.startDate,
+            rentalData.endDate
+        );
+
+        if (!isAvailable) {
+            throw new ConflictError("Tool is not available for the selected time.")
+        }
+
         // Calculate total amount
         const totalAmount = calculateTotalAmount(
             tool.hourlyRate,
