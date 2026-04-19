@@ -2,6 +2,70 @@ import Joi from "joi";
 
 const statuses = ["Active", "Completed", "Cancelled", "Overdue"] as const;
 
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Rental:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         toolId:
+ *           type: string
+ *         customerId:
+ *           type: string
+ *         quantity:
+ *           type: integer
+ *         startDate:
+ *           type: string
+ *           format: date-time
+ *         endDate:
+ *           type: string
+ *           format: date-time
+ *         totalAmount:
+ *           type: number
+ *         status:
+ *           type: string
+ *           enum: [Active, Completed, Cancelled, Overdue]
+ *         lateFee:
+ *           type: number
+ *     
+ *     CreateRentalDTO:
+ *       type: object
+ *       required:
+ *         - toolId
+ *         - customerId
+ *         - quantity
+ *         - startDate
+ *         - endDate
+ *       properties:
+ *         toolId:
+ *           type: string
+ *         customerId:
+ *           type: string
+ *         quantity:
+ *           type: integer
+ *         startDate:
+ *           type: string
+ *           format: date-time
+ *         endDate:
+ *           type: string
+ *           format: date-time
+ *     
+ *     ErrorResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *         error:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *             code:
+ *               type: string
+ */
 export const rentalSchemas = {
 
     // POST - create new rental
