@@ -2,7 +2,8 @@ import { Router } from "express";
 import * as toolController from "../controllers/toolController";
 import { validateRequest } from "../middleware/validate";
 import { toolSchemas } from "../validations/toolValidation";
-
+import authenticate from "../middleware/authenticate";
+import authorize from "../middleware/authorize";
 const router = Router();
 
 /**
@@ -175,6 +176,8 @@ router.get("/:id",
  */
 // POST - create new tool
 router.post("/",
+    authenticate,
+    authorize({ hasRole: ["admin"] }),
     validateRequest(toolSchemas.create),
     toolController.generateTool);
 
@@ -223,6 +226,8 @@ router.post("/",
  */
 // PUT - update tool by id 
 router.put("/:id",
+    authenticate,
+    authorize({ hasRole: ["admin"] }),
     validateRequest(toolSchemas.update),
     toolController.updateToolDetails);
 
@@ -247,7 +252,9 @@ router.put("/:id",
  *         description: Tool not found
  */
 // DELETE - tool by id
-router.delete("/:id", 
+router.delete("/:id",
+    authenticate,
+    authorize({ hasRole: ["admin"] }), 
     validateRequest(toolSchemas.delete),
     toolController.removeTool);
 

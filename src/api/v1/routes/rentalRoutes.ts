@@ -2,14 +2,22 @@ import { Router } from "express";
 import * as rentalController from "../controllers/rentalController";
 import { validateRequest } from "../middleware/validate";
 import { rentalSchemas } from "../validations/rentalValidation";
+import authenticate from "../middleware/authenticate";
+import authorize from "../middleware/authorize";
 
 const router = Router();
 
 // GET - rentals by active status
-router.get("/active", rentalController.displayActiveRentals);
+router.get("/active", 
+    authenticate,
+    authorize({ hasRole: ["staff", "admin"]}),
+    rentalController.displayActiveRentals);
 
 // GET - overdue rentals 
-router.get("/overdue", rentalController.displayOverdueRentals);
+router.get("/overdue",
+    authenticate,
+    authorize({ hasRole: ["staff", "admin"]}),
+    rentalController.displayOverdueRentals);
 
 /**
  * @openapi
@@ -44,11 +52,15 @@ router.get("/overdue", rentalController.displayOverdueRentals);
  */
 // GET - by customer Id
 router.get("/customer/:customerId", 
+    authenticate,
+    authorize({ hasRole: ["staff", "admin"] }),
     validateRequest(rentalSchemas.getByCustomer),
     rentalController.displayRentalsByCustomer);
 
 // GET - by tool Id
 router.get("/tool/:toolId", 
+    authenticate,
+    authorize({ hasRole: ["staff", "admin"] }),
     validateRequest(rentalSchemas.getByTool),
     rentalController.displayRentalsByTool);
 
@@ -77,7 +89,9 @@ router.get("/tool/:toolId",
  *                     $ref: '#/components/schemas/Rental'
  */ 
 // GET - all rentals
-router.get("/", 
+router.get("/",
+    authenticate,
+    authorize({ hasRole: ["staff", "admin"] }), 
     validateRequest(rentalSchemas.list),
     rentalController.displayAllRentals);
 
@@ -115,7 +129,9 @@ router.get("/",
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 // GET - by rental Id
-router.get("/:id", 
+router.get("/:id",
+    authenticate,
+    authorize({ hasRole: ["staff", "admin"] }), 
     validateRequest(rentalSchemas.getById),
     rentalController.displayRentalById);
 
@@ -152,18 +168,24 @@ router.get("/:id",
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 // POST - create new rental
-router.post("/", 
+router.post("/",
+    authenticate,
+    authorize({ hasRole: ["staff", "admin"] }), 
     validateRequest(rentalSchemas.create),
     rentalController.generateRental);
 
 // POST - return rental
 router.post(
     "/:id/return",
+    authenticate,
+    authorize({ hasRole: ["staff", "admin"] }),
     validateRequest(rentalSchemas.getById),
     rentalController.returnRental);
 
 // POST - update rental [time extension]
 router.put("/:id",
+    authenticate,
+    authorize({ hasRole: ["staff", "admin"] }),
     validateRequest(rentalSchemas.update),
     rentalController.updateRentalDetails);
 
@@ -201,7 +223,9 @@ router.put("/:id",
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 // POST - cancel rental by Id
-router.post("/:id/cancel", 
+router.post("/:id/cancel",
+    authenticate,
+    authorize({ hasRole: ["staff", "admin"] }), 
     validateRequest(rentalSchemas.cancel),
     rentalController.cancelRental);
 
