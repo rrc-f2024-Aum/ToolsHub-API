@@ -1,14 +1,6 @@
 name: Deploy Documentation
 
 on:
-    push:
-      branches:
-        - main
-        - development
-      paths:
-        - "src/**/*.ts"
-        - "config/**/*.ts"
-        - "openapi.json"
     workflow_dispatch: # Only run when manually triggered
 
 jobs:
