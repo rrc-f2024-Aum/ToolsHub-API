@@ -7,24 +7,55 @@ import { HTTP_STATUS } from "../../../constants/httpConstants";
 export const setUserRole = async (
     req: Request, res: Response, next: NextFunction
 ): Promise<void> => {
-    try {
-        const { uid, roles } = req.body;
-
-        const validRoles = ["customer", "staff", "admin"];
-        if (!validRoles.includes(roles)) {
-            res.status(HTTP_STATUS.BAD_REQUEST).json(
-                errorResponse(`Invalid role. Must be one of: ${validRoles.join(",")}`,
-            "INVALID_ROLE")
+     try {
+        const requesterRole = res.locals.role;
+        if (requesterRole !== "admin") {
+            res.status(HTTP_STATUS.FORBIDDEN).json(
+                errorResponse("Admin access required", "ADMIN_ONLY")
             );
             return;
         }
 
-        await auth.setCustomUserClaims(uid, { roles });
+        const { uid, role } = req.body;
+        if (!uid) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json(
+                errorResponse("UID is required", "MISSING_UID")
+            );
+            return;
+        }
+
+        if (!role) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json(
+                errorResponse("Role is required", "MISSING_ROLE")
+            );
+            return;
+        }
+        
+        const allowedRoles = ["customer", "staff", "admin"];
+        if (!allowedRoles.includes(role)) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json(
+                errorResponse(`Invalid role. Must be one of: ${allowedRoles.join(", ")}`, "INVALID_ROLE")
+            );
+            return;
+        }
+
+        try {
+            await auth.getUser(uid);
+        } catch (userError) {
+            res.status(HTTP_STATUS.NOT_FOUND).json(
+                errorResponse(`User with UID ${uid} not found`, "USER_NOT_FOUND")
+            );
+            return;
+        }
+
+        await auth.setCustomUserClaims(uid, { role });
 
         res.status(HTTP_STATUS.OK).json(
-            successResponse({ uid, roles}, `User role set to ${roles} successfully`)
+            successResponse({ uid, role }, 
+                `Role set to ${role} for user: ${uid}. User must obtain a new token for changes to take effect.`
+            )
         );
-    
+
     } catch (error) {
         next(error);
     }
