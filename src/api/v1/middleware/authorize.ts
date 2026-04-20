@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { AuthorizationError } from "../errors/errors";
+import { errorResponse } from "../models/responseModel";
+import { HTTP_STATUS } from "../../../constants/httpConstants";
 
 interface AuthorizationOptions {
     hasRole: string[];
@@ -17,9 +18,9 @@ const authorize = (opts: AuthorizationOptions) => {
             }
 
             if (!role) {
-                throw new AuthorizationError(
-                    "Forbidden: No role found",
-                    "ROLE_NOT_FOUND"
+                return res.status(HTTP_STATUS.FORBIDDEN).json(
+                    errorResponse("Forbidden: No role found",
+                    "ROLE_NOT_FOUND")
                 );
             }
 
@@ -27,12 +28,14 @@ const authorize = (opts: AuthorizationOptions) => {
                 return next();
             }
 
-            throw new AuthorizationError(
-                "Forbidden: Insufficient permissions",
-                "INSUFFICIENT_PERMISSIONS"
+            return res.status(HTTP_STATUS.FORBIDDEN).json(
+                errorResponse("Forbidden: Insufficient permissions",
+                "INSUFFICIENT_PERMISSIONS")
             );
         } catch (error) {
-            next(error);
+            return res.status(HTTP_STATUS.FORBIDDEN).json(
+                errorResponse("Forbidden: Access denied", "FORBIDDEN")
+            );
         }
     };
 };

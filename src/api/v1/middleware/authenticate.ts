@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { DecodedIdToken } from "firebase-admin/auth";
 import { auth } from "../../../config/firebaseConfig";
-import { AuthenticationError } from "../errors/errors";
-
+import { errorResponse } from "../models/responseModel";
+import { HTTP_STATUS } from "../../../constants/httpConstants";
 
 const authenticate = async (
     req: Request, res: Response, next: NextFunction
@@ -14,10 +14,10 @@ const authenticate = async (
             : undefined;
 
         if (!token) {
-            throw new AuthenticationError(
-                "Unauthorized: No token provided",
-                "TOKEN_NOT_FOUND"
+            res.status(HTTP_STATUS.UNAUTHORIZED).json(
+                errorResponse("Unauthorized: No token provided", "TOKEN_NOT_FOUND")
             );
+            return;
         }
 
         const decodedToken: DecodedIdToken = await auth.verifyIdToken(token);
@@ -28,16 +28,9 @@ const authenticate = async (
         next();
 
     } catch (error: unknown) {
-        if (error instanceof AuthenticationError) {
-            next(error);
-        } else {
-            next(
-                new AuthenticationError(
-                    "Unauthorized: Invalid token",
-                    "TOKEN_INVALID"
-                )
-            );
-        }
+        res.status(HTTP_STATUS.UNAUTHORIZED).json(
+            errorResponse("Unauthorized: Invalid token", "TOKEN_INVALID")
+        );
     }
 };
 
