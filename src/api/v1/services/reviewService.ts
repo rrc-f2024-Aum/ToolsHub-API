@@ -25,16 +25,13 @@ export const createCustomerReview = async(
     customerId: string,
     data: CreateReview
 ): Promise<string> => {
-
+    
     const rentalDoc = await db.collection("rentals").doc(rentalId).get();
     if (!rentalDoc.exists) {
         throw new NotFoundError(`Rental with ID ${rentalId} not found`);
     }
 
     const rental = rentalDoc.data();
-    if (rental?.customerId !== customerId) {
-        throw new ValidationError("You can only review your own rentals");
-    }
 
     if (rental?.status !== "Completed") {
         throw new ValidationError("You can only review completed rentals");
