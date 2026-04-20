@@ -123,6 +123,7 @@ export const generateRental = async (
 
     try {
         const rentalData = req.body;
+        rentalData.customerId = res.locals.uid;
 
         if(!validateRentalData(rentalData, res))
             return;
@@ -212,6 +213,30 @@ export const displayRentalsByCustomer = async(
         );
     } catch (error) {
         next (error);
+    }
+}
+
+// get rentals by tool ID
+export const displayRentalsByTool = async(
+    req: Request, res: Response, next: NextFunction
+): Promise<void> => {
+    try {
+        const { toolId } = req.params;
+
+        if (Array.isArray(toolId)) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json(
+                errorResponse("Invalid tool ID format", "INVALID_TOOL_ID")
+            );
+            return;
+        }
+
+        const rentals = await rentalService.getRentalsByTool(toolId);
+        res.status(HTTP_STATUS.OK).json(
+            successResponse(rentals, "Rentals retrieved successfully", rentals.length)
+        );
+
+    } catch (error) {
+        next(error);
     }
 }
 

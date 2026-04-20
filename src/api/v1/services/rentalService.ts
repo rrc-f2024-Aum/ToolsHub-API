@@ -58,6 +58,16 @@ export const createRental = async (rentalData: CreateRental): Promise<string> =>
             throw new ConflictError(`Tool ${rentalData.toolId} is not available for rental`);
         }
         
+        const isAvailable = await checkAvailability(
+            rentalData.toolId,
+            rentalData.startDate,
+            rentalData.endDate
+        );
+
+        if (!isAvailable) {
+            throw new ConflictError("Tool is not available for the selected time.")
+        }
+
         // Calculate total amount
         const totalAmount = calculateTotalAmount(
             tool.hourlyRate,
@@ -167,14 +177,19 @@ export const getActiveRentals = async (): Promise<Rental[]> => {
 // Get overdue rentals
 export const getOverdueRentals = async (): Promise<Rental[]> => {
     try {
-        const snapshot = await firestoreRepository.findByField(COLLECTION_NAME, "status", "Overdue");
+        const activeRentals = await getActiveRentals();
 
-        const rentals: Rental[] = [];
-        snapshot.forEach((doc) => {
-            rentals.push(formatRentalData(doc));
-        });
+        const now = new Date();
+        const overdueRentals: Rental[] = [];
 
-        return rentals;
+        for (const rental of activeRentals) {
+            const endDate = new Date(rental.endDate);
+            if (endDate < now) {
+                overdueRentals.push(rental);
+            }
+        }
+        return overdueRentals;
+        
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         throw new Error(`Failed to fetch overdue rentals: ${errorMessage}`);

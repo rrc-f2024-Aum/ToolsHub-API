@@ -2,6 +2,70 @@ import Joi from "joi";
 
 const statuses = ["Active", "Completed", "Cancelled", "Overdue"] as const;
 
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Rental:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         toolId:
+ *           type: string
+ *         customerId:
+ *           type: string
+ *         quantity:
+ *           type: integer
+ *         startDate:
+ *           type: string
+ *           format: date-time
+ *         endDate:
+ *           type: string
+ *           format: date-time
+ *         totalAmount:
+ *           type: number
+ *         status:
+ *           type: string
+ *           enum: [Active, Completed, Cancelled, Overdue]
+ *         lateFee:
+ *           type: number
+ *     
+ *     CreateRentalDTO:
+ *       type: object
+ *       required:
+ *         - toolId
+ *         - customerId
+ *         - quantity
+ *         - startDate
+ *         - endDate
+ *       properties:
+ *         toolId:
+ *           type: string
+ *         customerId:
+ *           type: string
+ *         quantity:
+ *           type: integer
+ *         startDate:
+ *           type: string
+ *           format: date-time
+ *         endDate:
+ *           type: string
+ *           format: date-time
+ *     
+ *     ErrorResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *         error:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *             code:
+ *               type: string
+ */
 export const rentalSchemas = {
 
     // POST - create new rental
@@ -11,10 +75,10 @@ export const rentalSchemas = {
                 "any.required": "Tool ID is required",
                 "string.empty": "Tool ID cannot be empty"
             }),
-            customerId: Joi.string().required().messages({
-                "any.required": "Customer ID is required",
-                "string.empty": "Customer ID cannot be empty"
-            }),
+            // customerId: Joi.string().required().messages({
+            //     "any.required": "Customer ID is required",
+            //     "string.empty": "Customer ID cannot be empty"
+
             quantity: Joi.number().integer().min(1).required().messages({
                 "any.required": "Quantity is required",
                 "number.min": "Quantity must be at least 1",
