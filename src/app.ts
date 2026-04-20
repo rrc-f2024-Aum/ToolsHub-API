@@ -24,6 +24,6 @@ setupSwagger(app);
 app.use("/api/v1/tools", toolRoutes);
 app.use("/api/v1/rentals", rentalRoutes);
 app.use("/api/v1", reviewRoutes);
-app.use("api/v1", adminRoutes);
+app.use("/api/v1", adminRoutes);
 
 export default app;

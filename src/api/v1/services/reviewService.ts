@@ -68,7 +68,7 @@ export const getReviewByTool = async(
 ): Promise<Review[]> => {
 
     const snapshot = await db.collection(COLLECTION_NAME)
-        .where("toolId", "==", "toolId")
+        .where("toolId", "==", toolId)
         .orderBy("createdAt", "desc").get();
 
     const reviews: Review[] = [];
