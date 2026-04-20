@@ -75,10 +75,10 @@ export const rentalSchemas = {
                 "any.required": "Tool ID is required",
                 "string.empty": "Tool ID cannot be empty"
             }),
-            customerId: Joi.string().required().messages({
-                "any.required": "Customer ID is required",
-                "string.empty": "Customer ID cannot be empty"
-            }),
+            // customerId: Joi.string().required().messages({
+            //     "any.required": "Customer ID is required",
+            //     "string.empty": "Customer ID cannot be empty"
+
             quantity: Joi.number().integer().min(1).required().messages({
                 "any.required": "Quantity is required",
                 "number.min": "Quantity must be at least 1",

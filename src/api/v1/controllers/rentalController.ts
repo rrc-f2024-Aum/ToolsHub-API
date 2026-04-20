@@ -123,6 +123,7 @@ export const generateRental = async (
 
     try {
         const rentalData = req.body;
+        rentalData.customerId = res.locals.uid;
 
         if(!validateRentalData(rentalData, res))
             return;
