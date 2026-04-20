@@ -79,7 +79,7 @@ router.get("/",
  *         required: true
  *         schema:
  *           type: string
- *           enum: [power_tools, hand_tools, gardening, painting, other]
+ *           enum: [Power_tools, Hand_tools, Gardening, Painting, Other]
  *         description: Tool category to filter by
  *     responses:
  *       200:
